@@ -2,7 +2,8 @@ import datetime
 from timeit import default_timer as timer
 from datetime import timedelta
 
-# 0. 60 Code Lines
+
+# 0. 45 Code Lines
 # 1. Получаем год из даты которую запросили
 # 2. Прибавляем к году N лет (в целом можно хоть 1000 лет) (Это доп параметр)
 # 3. Генерим возможные варианты дат c ограничением по дню недели
@@ -19,30 +20,23 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
 
     date_time = convert_string_to_date(date_string)
-    daymatrix = format('{0}{1}').format(day_matrix, str(date_time.year))
+    day_matrix = format('{0}{1}').format(day_matrix, str(date_time.year))
     for yr in range(years_count):
-        daymatrix = format('{0},{1}').format(daymatrix, str(date_time.year + yr + 1))
-    daymatrix = format('{0}{1}').format(daymatrix, ';')
+        day_matrix = format('{0},{1}').format(day_matrix, str(date_time.year + yr + 1))
+    day_matrix = format('{0}{1}').format(day_matrix, ';')
 
-    matrix = split_string_by_sep(daymatrix, ';', ',')
-    minutes = matrix[0]
-    hours = matrix[1]
-    weekdays = matrix[2]
-    days = matrix[3]
-    month = matrix[4]
-    years = matrix[5]
+    matrix = split_string_by_sep(day_matrix, ';', ',')
 
-    # df_matrix_dates = pd.DataFrame()
     gen_dates = []
-    for yr in years:
-        for mn in month:
-            for d in days:
-                for hr in hours:
-                    for min in minutes:
-                        date_str = '{0}.{1}.{2} {3}:{4}'.format(d, mn, yr, hr, min)
+    for yr in matrix[5]:  # years:
+        for mn in matrix[4]:  # month:
+            for d in matrix[3]:  # days:
+                for hr in matrix[1]:  # hours:
+                    for minute in matrix[0]:  # minutes:
+                        date_str = '{0}.{1}.{2} {3}:{4}'.format(d, mn, yr, hr, minute)
                         day_date_time = convert_string_to_date(date_str)
                         # Получаем американский формат дня недели
-                        if int(day_date_time.strftime("%w")) in weekdays:
+                        if int(day_date_time.strftime("%w")) in matrix[2]:  # weekdays:
                             if day_date_time > date_time:
                                 gen_dates.append(day_date_time)
 
@@ -61,7 +55,7 @@ def split_string_by_sep(string, delimiter, delimiter1):
     # Нестанадртные вводные данные по дню недели:
     # используется американский календарь,
     # в котором 1 – это воскресенье, 2 – понедельник и т.д.
-    # Мы должны отнять 1 от вводных данных
+    # Мы должны отнять 1 от вводных данных, т.е. week начинается с 0 in python
     weekdays = [int(u) - 1 for u in (result[2].split(delimiter1))]
     days = [u for u in (result[3].split(delimiter1))]
     month = [u for u in (result[4].split(delimiter1))]
