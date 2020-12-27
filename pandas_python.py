@@ -14,7 +14,7 @@ import pandas as pd
 # 8. Берем первый элемент из итогового массива - это и есть ответ.
 def calculate_date_nice(date_string='09.07.2010 23:36',
                         day_matrix='0,45;12;1,2,6;3,6,14,18,21,24,28;1,2,3,4,5,6,7,8,9,10,11,12;',
-                        years_count=2):
+                        years_count=1):
     start_time = timer()
     if years_count < 1:
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
@@ -25,8 +25,11 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
     dfs = {}
     for col in df:
         dfs[col] = df[col].str.split(',', expand=True)
-    years = pd.DataFrame([pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year])
-
+    if years_count == 1:
+        years = pd.DataFrame([pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year])
+    else:
+        years = pd.DataFrame(
+            [pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year + year for year in range(years_count)])
     dataset = []
     for year in years:
         for month in dfs['months']:
