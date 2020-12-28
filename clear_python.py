@@ -3,7 +3,7 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 
-# 0. 44 Code Lines
+# 0. 42 Code Lines
 # 1. Получаем год из даты которую запросили
 # 2. Прибавляем к году N лет (в целом можно хоть 1000 лет) (Это доп параметр)
 # 3. Генерим возможные варианты дат c ограничением по дню недели
@@ -13,7 +13,6 @@ from datetime import timedelta
 # 7. Берем первый элемент из итогового массива - это и есть ответ.
 def calculate_date_faster(date_string='09.07.2010 23:36',
                           day_matrix='0,45;12;1,2,6;3,6,14,18,21,24,28;1,2,3,4,5,6,7,8,9,10,11,12;',
-                          # '0,45;0,4,8,12,17,22;2,6;1,2,3,4,5,11,18,24;1,2,3,9,11;',
                           years_count=1):
     start_time = timer()
     if years_count < 1:
@@ -23,7 +22,7 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
     day_matrix = format('{0}{1}').format(day_matrix, str(date_time.year))
     for yr in range(years_count - 1):
         day_matrix = format('{0},{1}').format(day_matrix, str(date_time.year + yr + 1))
-    day_matrix = format('{0}{1}').format(day_matrix, ';')
+    day_matrix = format('{0};').format(day_matrix)
 
     matrix = split_string_by_sep(day_matrix, ';', ',')
 
@@ -33,17 +32,19 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
             for d in matrix[3]:  # days:
                 for hr in matrix[1]:  # hours:
                     for minute in matrix[0]:  # minutes:
-                        date_str = '{0}.{1}.{2} {3}:{4}'.format(d, mn, yr, hr, minute)
-                        day_date_time = convert_string_to_date(date_str)
+                        # Формируем дату для загрузки в сет
+                        day_date_time = datetime.datetime(int(yr), int(mn), int(d), int(hr), int(minute))
                         # Получаем американский формат дня недели
                         if int(day_date_time.strftime("%w")) in matrix[2]:  # weekdays:
+                            # Если полученная дата больше чем исходная, то загружаем в сет
                             if day_date_time > date_time:
                                 gen_dates.append(day_date_time)
 
     gen_dates.sort()
+
     end_time = timer()
     print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"), timedelta(seconds=end_time - start_time)))
-    return gen_dates[0]
+    return gen_dates[0], timedelta(seconds=end_time - start_time)
 
 
 def split_string_by_sep(string, delimiter, delimiter1):
@@ -63,6 +64,5 @@ def split_string_by_sep(string, delimiter, delimiter1):
 
 
 def convert_string_to_date(date_string):
-    format_str = '%d.%m.%Y %H:%M'  # The format
-    datetime_obj = datetime.datetime.strptime(date_string, format_str)
+    datetime_obj = datetime.datetime.strptime(date_string, '%d.%m.%Y %H:%M')
     return datetime_obj

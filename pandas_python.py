@@ -25,22 +25,20 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
     dfs = {}
     for col in df:
         dfs[col] = df[col].str.split(',', expand=True)
-    if years_count == 1:
-        years = pd.DataFrame([pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year])
-    else:
-        years = pd.DataFrame(
-            [pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year + year for year in range(years_count)])
+
+    years = pd.DataFrame(
+        [pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year + year for year in
+         range(years_count)])
+
     dataset = []
     for year in years:
         for month in dfs['months']:
             for day in dfs['days']:
                 for hour in dfs['hours']:
                     for minute in dfs['minutes']:
-                        dataset.append(datetime(int(years[year][0]),
-                                                int(dfs['months'][month][0]),
-                                                int(dfs['days'][day][0]),
-                                                int(dfs['hours'][hour][0]),
-                                                int(dfs['minutes'][minute][0])))
+                        dataset.append(
+                            datetime(int(years[year][0]), int(dfs['months'][month][0]), int(dfs['days'][day][0]),
+                                     int(dfs['hours'][hour][0]), int(dfs['minutes'][minute][0])))
 
     df_result = pd.DataFrame(dataset, columns=['date'])
     df_result['weekday'] = pd.Series(df_result.date.dt.strftime("%w"), dtype='int32')
@@ -52,4 +50,4 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
     end_time = timer()
     print('Next date is: {0}; Elapsed time: {1}'.format(df_result_final.iloc[0].date.strftime("%d.%m.%Y %H:%M"),
                                                         timedelta(seconds=end_time - start_time)))
-    return df_result_final.iloc[0]
+    return df_result_final.iloc[0], timedelta(seconds=end_time - start_time)
