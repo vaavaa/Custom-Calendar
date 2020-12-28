@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 import pandas as pd
 
 
-# 0. 37 Code Lines
+# 0. 40 Code Lines
 # 1. Получаем год из даты которую запросили
 # 2. Прибавляем к году N лет (в целом можно хоть 1000 лет) (Это доп параметр)
 # 3. Генерим возможные варианты дат без ограничений
@@ -26,9 +26,7 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
     for col in df:
         dfs[col] = df[col].str.split(',', expand=True)
 
-    years = pd.DataFrame(
-        [pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year + year for year in
-         range(years_count)])
+    years = [pd.to_datetime(date_string, format='%d.%m.%Y %H:%M').year + year for year in range(years_count)]
 
     dataset = []
     for year in years:
@@ -37,17 +35,23 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
                 for hour in dfs['hours']:
                     for minute in dfs['minutes']:
                         dataset.append(
-                            datetime(int(years[year][0]), int(dfs['months'][month][0]), int(dfs['days'][day][0]),
+                            datetime(int(year), int(dfs['months'][month][0]), int(dfs['days'][day][0]),
                                      int(dfs['hours'][hour][0]), int(dfs['minutes'][minute][0])))
 
-    df_result = pd.DataFrame(dataset, columns=['date'])
-    df_result['weekday'] = pd.Series(df_result.date.dt.strftime("%w"), dtype='int32')
-    df_result = df_result[df_result['weekday'].isin([int(weekday) - 1 for weekday in dfs['weekdays'].iloc[0]])]
+    if len(dataset) >0 :
+        df_result = pd.DataFrame(dataset, columns=['date'])
+        df_result['weekday'] = pd.Series(df_result.date.dt.strftime("%w"), dtype='int32')
+        df_result = df_result[df_result['weekday'].isin([int(weekday) - 1 for weekday in dfs['weekdays'].iloc[0]])]
 
-    mask = (df_result['date'] > pd.to_datetime(date_string, format='%d.%m.%Y %H:%M'))
-    df_result_final = df_result.loc[mask]
+        mask = (df_result['date'] > pd.to_datetime(date_string, format='%d.%m.%Y %H:%M'))
+        df_result_final = df_result.loc[mask]
+
+        end_time = timer()
+        if len(df_result_final) > 0:
+            print('Next date is: {0}; Elapsed time: {1}'.format(df_result_final.iloc[0].date.strftime("%d.%m.%Y %H:%M"),
+                                                                timedelta(seconds=end_time - start_time)))
+            return df_result_final.iloc[0], timedelta(seconds=end_time - start_time)
 
     end_time = timer()
-    print('Next date is: {0}; Elapsed time: {1}'.format(df_result_final.iloc[0].date.strftime("%d.%m.%Y %H:%M"),
-                                                        timedelta(seconds=end_time - start_time)))
-    return df_result_final.iloc[0], timedelta(seconds=end_time - start_time)
+    print('Next date is: None; Elapsed time: {0}'.format(timedelta(seconds=end_time - start_time)))
+    return None, timedelta(seconds=end_time - start_time)

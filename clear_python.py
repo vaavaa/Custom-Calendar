@@ -3,7 +3,7 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 
-# 0. 42 Code Lines
+# 0. 45 Code Lines
 # 1. Получаем год из даты которую запросили
 # 2. Прибавляем к году N лет (в целом можно хоть 1000 лет) (Это доп параметр)
 # 3. Генерим возможные варианты дат c ограничением по дню недели
@@ -13,7 +13,7 @@ from datetime import timedelta
 # 7. Берем первый элемент из итогового массива - это и есть ответ.
 def calculate_date_faster(date_string='09.07.2010 23:36',
                           day_matrix='0,45;12;1,2,6;3,6,14,18,21,24,28;1,2,3,4,5,6,7,8,9,10,11,12;',
-                          years_count=1):
+                          years_count=2):
     start_time = timer()
     if years_count < 1:
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
@@ -41,9 +41,11 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
                                 gen_dates.append(day_date_time)
 
     gen_dates.sort()
-
     end_time = timer()
-    print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"), timedelta(seconds=end_time - start_time)))
+    if len(gen_dates) > 0:
+        print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"), timedelta(seconds=end_time - start_time)))
+    else:
+        print('Next date is: None; Elapsed time: {0}'.format(timedelta(seconds=end_time - start_time)))
     return gen_dates[0], timedelta(seconds=end_time - start_time)
 
 
