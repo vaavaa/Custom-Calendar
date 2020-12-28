@@ -3,7 +3,7 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 
-# 0. 45 Code Lines
+# 0. 46 Code Lines
 # 1. Получаем год из даты которую запросили
 # 2. Прибавляем к году N лет (в целом можно хоть 1000 лет) (Это доп параметр)
 # 3. Генерим возможные варианты дат c ограничением по дню недели
@@ -44,9 +44,10 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
     end_time = timer()
     if len(gen_dates) > 0:
         print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"), timedelta(seconds=end_time - start_time)))
+        return gen_dates[0], timedelta(seconds=end_time - start_time)
     else:
         print('Next date is: None; Elapsed time: {0}'.format(timedelta(seconds=end_time - start_time)))
-    return gen_dates[0], timedelta(seconds=end_time - start_time)
+        return None, timedelta(seconds=end_time - start_time)
 
 
 def split_string_by_sep(string, delimiter, delimiter1):
