@@ -34,11 +34,13 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
             for day in dfs['days']:
                 for hour in dfs['hours']:
                     for minute in dfs['minutes']:
-                        dataset.append(
-                            datetime(int(year), int(dfs['months'][month][0]), int(dfs['days'][day][0]),
-                                     int(dfs['hours'][hour][0]), int(dfs['minutes'][minute][0])))
-
-    if len(dataset) >0 :
+                        try:
+                            dataset.append(
+                                datetime(int(year), int(dfs['months'][month][0]), int(dfs['days'][day][0]),
+                                         int(dfs['hours'][hour][0]), int(dfs['minutes'][minute][0])))
+                        except ValueError:
+                            pass
+    if len(dataset) > 0:
         df_result = pd.DataFrame(dataset, columns=['date'])
         df_result['weekday'] = pd.Series(df_result.date.dt.strftime("%w"), dtype='int32')
         df_result = df_result[df_result['weekday'].isin([int(weekday) - 1 for weekday in dfs['weekdays'].iloc[0]])]
