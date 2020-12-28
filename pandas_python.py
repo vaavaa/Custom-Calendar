@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 import pandas as pd
 
 
-# 0. 40 Code Lines
+# 0. 44 Code Lines
 # 1. Получаем год из даты которую запросили
 # 2. Прибавляем к году N лет (в целом можно хоть 1000 лет) (Это доп параметр)
 # 3. Генерим возможные варианты дат без ограничений
@@ -16,6 +16,9 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
                         day_matrix='0,45;12;1,2,6;3,6,14,18,21,24,28;1,2,3,4,5,6,7,8,9,10,11,12;',
                         years_count=1):
     start_time = timer()
+
+    print('Method NICE. date_string = {0} day_matrix={1} years_count={2}'.format(date_string, day_matrix, years_count))
+
     if years_count < 1:
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
 
