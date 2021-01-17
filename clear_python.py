@@ -18,6 +18,9 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
     print('Method CLEAR. date_string = {0} day_matrix={1} years_count={2}'.format(date_string, day_matrix, years_count))
     if years_count < 1:
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
+        end_time = timer()
+        return None, timedelta(seconds=end_time - start_time)
+
 
     date_time = convert_string_to_date(date_string)
     day_matrix = format('{0}{1}').format(day_matrix, str(date_time.year))

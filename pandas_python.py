@@ -21,6 +21,8 @@ def calculate_date_nice(date_string='09.07.2010 23:36',
 
     if years_count < 1:
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
+        end_time = timer()
+        return None, timedelta(seconds=end_time - start_time)
 
     df = pd.read_csv(StringIO(day_matrix),
                      header=None, usecols=[0, 1, 2, 3, 4], names=['minutes', 'hours', 'weekdays', 'days', 'months'],
