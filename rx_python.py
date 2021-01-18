@@ -3,6 +3,7 @@ import datetime
 from timeit import default_timer as timer
 from datetime import timedelta, datetime
 from clear_python import convert_string_to_date
+from rx import operators as ops
 
 gen_dates = []
 
@@ -24,6 +25,10 @@ def calculate_date_rx(date_string='09.07.2010 23:36',
     for i in split_result:
         matrix.append(rx.from_list(list(map(int, i.split(',')))))
 
+    matrix[2] = matrix[2].pipe(
+        ops.map(lambda value: value - 1)
+    )
+
     years_set.subscribe(
         on_next=lambda yr: matrix[4].subscribe(
             lambda mn: matrix[3].subscribe(
@@ -36,8 +41,15 @@ def calculate_date_rx(date_string='09.07.2010 23:36',
         )
     )
 
+    gen_dates.sort()
     end_time = timer()
-    return None, timedelta(seconds=end_time - start_time)
+    if len(gen_dates) > 0:
+        print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"),
+                                                            timedelta(seconds=end_time - start_time)))
+        return gen_dates[0], timedelta(seconds=end_time - start_time)
+    else:
+        print('Next date is: None; Elapsed time: {0}'.format(timedelta(seconds=end_time - start_time)))
+        return None, timedelta(seconds=end_time - start_time)
 
 
 def split_string_by_sep(string, delimiter):
