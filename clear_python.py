@@ -78,6 +78,3 @@ def convert_string_to_date(date_string):
     datetime_obj = datetime.datetime.strptime(date_string, '%d.%m.%Y %H:%M')
     return datetime_obj
 
-
-def is_leap_year(year):
-    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
