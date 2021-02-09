@@ -70,9 +70,8 @@ def create_date(yr, mn, d, hr, minute, date_time, weekdays):
     try:
         day_date_time = datetime(int(yr), int(mn), int(d), int(hr), int(minute))
         if day_date_time > date_time:
-            # Получаем американский формат дня недели
             weekdays.subscribe(
-                lambda week_day: add_date(week_day,day_date_time)
+                lambda week_day: add_date(week_day, day_date_time)
             )
     except ValueError:
         pass
