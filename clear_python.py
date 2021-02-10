@@ -15,12 +15,11 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
                           day_matrix='0,45;12;1,2,6;3,6,14,18,21,24,28;1,2,3,4,5,6,7,8,9,10,11,12;',
                           years_count=2):
     start_time = timer()
-    print('Method CLEAR. date_string = {0} day_matrix={1} years_count={2}'.format(date_string, day_matrix, years_count))
+    # print('Method CLEAR. date_string = {0} day_matrix={1} years_count={2}'.format(date_string, day_matrix, years_count))
     if years_count < 1:
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
         end_time = timer()
         return None, timedelta(seconds=end_time - start_time)
-
 
     date_time = convert_string_to_date(date_string)
     day_matrix = format('{0}{1}').format(day_matrix, str(date_time.year))
@@ -34,27 +33,28 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
     for yr in matrix[5]:  # years:
         for mn in matrix[4]:  # month:
             for d in matrix[3]:  # days:
-                    for hr in matrix[1]:  # hours:
-                        for minute in matrix[0]:  # minutes:
-                            # Формируем дату для загрузки в сет
-                            try:
-                                day_date_time = datetime.datetime(int(yr), int(mn), int(d), int(hr), int(minute))
-                                # Получаем американский формат дня недели
-                                if int(day_date_time.strftime("%w")) in matrix[2]:  # weekdays:
-                                    # Если полученная дата больше чем исходная, то загружаем в сет
-                                    if day_date_time > date_time:
-                                        gen_dates.append(day_date_time)
-                            except ValueError:
-                                pass
+                for hr in matrix[1]:  # hours:
+                    for minute in matrix[0]:  # minutes:
+                        # Формируем дату для загрузки в сет
+                        try:
+                            day_date_time = datetime.datetime(int(yr), int(mn), int(d), int(hr), int(minute))
+                            # Получаем американский формат дня недели
+                            if int(day_date_time.strftime("%w")) in matrix[2]:  # weekdays:
+                                # Если полученная дата больше чем исходная, то загружаем в сет
+                                if day_date_time > date_time:
+                                    gen_dates.append(day_date_time)
+                        except ValueError:
+                            pass
 
     gen_dates.sort()
     end_time = timer()
+    return_value = [None] * 2
     if len(gen_dates) > 0:
-        print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"),
-                                                            timedelta(seconds=end_time - start_time)))
+        # print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"),
+        #                                                     timedelta(seconds=end_time - start_time)))
         return gen_dates[0], timedelta(seconds=end_time - start_time)
     else:
-        print('Next date is: None; Elapsed time: {0}'.format(timedelta(seconds=end_time - start_time)))
+        # print('Next date is: None; Elapsed time: {0}'.format(timedelta(seconds=end_time - start_time)))
         return None, timedelta(seconds=end_time - start_time)
 
 
@@ -77,4 +77,3 @@ def split_string_by_sep(string, delimiter, delimiter1):
 def convert_string_to_date(date_string):
     datetime_obj = datetime.datetime.strptime(date_string, '%d.%m.%Y %H:%M')
     return datetime_obj
-

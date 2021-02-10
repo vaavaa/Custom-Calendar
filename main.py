@@ -1,12 +1,9 @@
 import multiprocessing
-import time
 from enum import Enum
-from threading import current_thread
 import rx
 from rx.scheduler import ThreadPoolScheduler
 from rx import operators as ops
 from datetime import timedelta
-from time import sleep
 from timeit import default_timer as timer
 
 from clear_python import calculate_date_faster
@@ -25,14 +22,14 @@ def one_thread(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
     total_timeCount = 0
 
     for i in range(count_times):
-        if clear_or_nice_or_rx == 0:
+        if clear_or_nice_or_rx == ClearNiceRx.clear:
             # Clear
             result = calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)
-        elif clear_or_nice_or_rx == 1:
+        elif clear_or_nice_or_rx == ClearNiceRx.nice:
             # Nice
             result = calculate_date_nice(day_matrix='45;12;1;29;2;', years_count=200)
             # RX
-        elif clear_or_nice_or_rx == 2:
+        elif clear_or_nice_or_rx == ClearNiceRx.rx:
             result = calculate_date_rx(day_matrix='45;12;1;29;2;', years_count=200)
 
         total_timeCount = total_timeCount + result[1].microseconds
@@ -49,30 +46,34 @@ def one_thread(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
 
 def multi_threads(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
     start_time = timer()
-    total_timeCount = 0
-
-    end_time = timer()
-
     # calculate cpu count, using which will create a ThreadPoolScheduler
     thread_count = multiprocessing.cpu_count()
     thread_pool_scheduler = ThreadPoolScheduler(thread_count)
     print("Cpu count is : {0}".format(thread_count))
-
     range_list = range(count_times)
-    chunks = split_list(range_list,int(count_times/thread_count))
+    chunks = split_list(range_list, int(count_times / thread_count) + 1)
+    i: int = 0
+    subscriber = [None] * thread_count
+    task_complete_counter = 0
 
     for cpu_c in chunks:
-        rx.from_(cpu_c) \
+        subscriber[i] = rx.from_(cpu_c) \
             .pipe(
             ops.map(lambda a: calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)),
             ops.subscribe_on(thread_pool_scheduler)
-        ) \
-            .subscribe(
-            lambda s: print(""),
+        ).subscribe(
+            lambda s: print("Next date is: {0}; Elapsed time: {1}".format(s[0], s[1])),
             lambda error: print(error),
-            lambda: print("Task {0} complete. Total done is {1}".format(cpu_c, total_timeCount)),
-            lambda on_next: print("Total done is {1}".format(on_next, total_timeCount + 1))
+            on_next=final_time(start_time)
         )
+        i = i + 1
+
+    end_time = timer()
+    print("everything is done {}".format(task_complete_counter))
+    print('Total execution times: {0} Average time is {1} microsec. Total elapsed time is : {2}'
+          .format(count_times,
+                  0,
+                  timedelta(seconds=end_time - start_time)))
 
 
 def split_list(the_list, chunk_size):
@@ -81,6 +82,12 @@ def split_list(the_list, chunk_size):
         result_list.append(the_list[:chunk_size])
         the_list = the_list[chunk_size:]
     return result_list
+
+
+def final_time(start_time):
+    end_time = timer()
+    print('Total elapsed time is : {0}'.format(timedelta(seconds=end_time - start_time)))
+
 
 if __name__ == '__main__':
     multi_threads(count_times=10000)
