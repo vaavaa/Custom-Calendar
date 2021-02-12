@@ -30,7 +30,7 @@ _Примечание. В данном примере, используется 
 1. pandas python
 1. rx python
 
-Algorithmic approach is the same for all 3 solutions.
+Algorithmic approach is the same for all 3 solutions, used modules are different
 
 **Игра в песочнице с параллельными вычислениями.**
 
