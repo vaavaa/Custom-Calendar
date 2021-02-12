@@ -15,7 +15,6 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
                           day_matrix='0,45;12;1,2,6;3,6,14,18,21,24,28;1,2,3,4,5,6,7,8,9,10,11,12;',
                           years_count=2):
     start_time = timer()
-    # print('Method CLEAR. date_string = {0} day_matrix={1} years_count={2}'.format(date_string, day_matrix, years_count))
     if years_count < 1:
         print('Нужно минимум +1 год. Указали {0}.'.format(years_count))
         end_time = timer()
@@ -50,11 +49,8 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
     end_time = timer()
     return_value = [None] * 2
     if len(gen_dates) > 0:
-        # print('Next date is: {0}; Elapsed time: {1}'.format(gen_dates[0].strftime("%d.%m.%Y %H:%M"),
-        #                                                     timedelta(seconds=end_time - start_time)))
         return gen_dates[0], timedelta(seconds=end_time - start_time)
     else:
-        # print('Next date is: None; Elapsed time: {0}'.format(timedelta(seconds=end_time - start_time)))
         return None, timedelta(seconds=end_time - start_time)
 
 
