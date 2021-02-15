@@ -1,4 +1,6 @@
+import concurrent
 import multiprocessing
+import threading
 from enum import Enum
 import rx
 from rx.scheduler import ThreadPoolScheduler
@@ -33,20 +35,30 @@ def one_thread(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
     start_time = timer()
     total_timeCount = 0
 
-    for i in range(count_times):
-        if clear_or_nice_or_rx == ClearNiceRx.clear:
-            # Clear
-            result = calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)
-        elif clear_or_nice_or_rx == ClearNiceRx.nice:
-            # Nice
-            result = calculate_date_nice(day_matrix='45;12;1;29;2;', years_count=200)
-            # RX
-        elif clear_or_nice_or_rx == ClearNiceRx.rx:
-            result = calculate_date_rx(day_matrix='45;12;1;29;2;', years_count=200)
+    range_list = range(count_times)
+    subscriber = rx.from_(range_list) \
+        .pipe(
+        ops.map(lambda a: calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200))
+    ).subscribe(
+        lambda s: final_time(start_time),  # print("Next date is: {0}; Elapsed time: {1}".format(s[0], s[1]))
+        lambda error: print(error),
+        on_next=final_time(start_time)
+    )
 
-        total_timeCount = total_timeCount + result[1].microseconds
-        end_time_mid = timer()
-        print('Iteration: {0}. Time elapsed so far {1}'.format(i, timedelta(seconds=end_time_mid - start_time)))
+    # for i in range(count_times):
+    #     if clear_or_nice_or_rx == ClearNiceRx.clear:
+    #         # Clear
+    #         result = calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)
+    #     elif clear_or_nice_or_rx == ClearNiceRx.nice:
+    #         # Nice
+    #         result = calculate_date_nice(day_matrix='45;12;1;29;2;', years_count=200)
+    #         # RX
+    #     elif clear_or_nice_or_rx == ClearNiceRx.rx:
+    #         result = calculate_date_rx(day_matrix='45;12;1;29;2;', years_count=200)
+    #
+    #     total_timeCount = total_timeCount + result[1].microseconds
+    #     end_time_mid = timer()
+    #     print('Iteration: {0}. Time elapsed so far {1}'.format(i, timedelta(seconds=end_time_mid - start_time)))
 
     end_time = timer()
 
@@ -56,7 +68,7 @@ def one_thread(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
                   timedelta(seconds=end_time - start_time)))
 
 
-def multi_threads(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
+def rx_multi_threads(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
     start_time = timer()
 
     # calculate cpu count, using which will create a ThreadPoolScheduler
@@ -80,6 +92,28 @@ def multi_threads(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
             on_next=final_time(start_time)
         )
         i = i + 1
+
+    end_time = timer()
+    print("everything is done {}".format(task_complete_counter))
+    print('Total execution times: {0} Average time is {1} microsec. Total elapsed time is : {2}'
+          .format(count_times,
+                  0,
+                  timedelta(seconds=end_time - start_time)))
+
+
+def multi_threads(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
+    start_time = timer()
+
+    # calculate cpu count, using which will create a ThreadPoolScheduler
+    thread_count = multiprocessing.cpu_count()
+    print("Cpu count is : {0}".format(thread_count))
+    range_list = range(count_times)
+    # chunks = split_list(range_list, int(count_times / thread_count) + 1)
+    i: int = 0
+    subscriber = [None] * thread_count
+    task_complete_counter = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
+        executor.map(calculate_date_faster, range_list)
 
     end_time = timer()
     print("everything is done {}".format(task_complete_counter))
