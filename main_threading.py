@@ -35,30 +35,21 @@ def one_thread(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
     start_time = timer()
     total_timeCount = 0
 
-    range_list = range(count_times)
-    subscriber = rx.from_(range_list) \
-        .pipe(
-        ops.map(lambda a: calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200))
-    ).subscribe(
-        lambda s: final_time(start_time),  # print("Next date is: {0}; Elapsed time: {1}".format(s[0], s[1]))
-        lambda error: print(error),
-        on_next=final_time(start_time)
-    )
+    for i in range(count_times):
+        if clear_or_nice_or_rx == ClearNiceRx.clear:
+            # Clear
+            result = calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)
+        elif clear_or_nice_or_rx == ClearNiceRx.nice:
+            # Nice
+            result = calculate_date_nice(day_matrix='45;12;1;29;2;', years_count=200)
+            # RX
+        elif clear_or_nice_or_rx == ClearNiceRx.rx:
+            result = calculate_date_rx(day_matrix='45;12;1;29;2;', years_count=200)
 
-    # for i in range(count_times):
-    #     if clear_or_nice_or_rx == ClearNiceRx.clear:
-    #         # Clear
-    #         result = calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)
-    #     elif clear_or_nice_or_rx == ClearNiceRx.nice:
-    #         # Nice
-    #         result = calculate_date_nice(day_matrix='45;12;1;29;2;', years_count=200)
-    #         # RX
-    #     elif clear_or_nice_or_rx == ClearNiceRx.rx:
-    #         result = calculate_date_rx(day_matrix='45;12;1;29;2;', years_count=200)
-    #
-    #     total_timeCount = total_timeCount + result[1].microseconds
-    #     end_time_mid = timer()
-    #     print('Iteration: {0}. Time elapsed so far {1}'.format(i, timedelta(seconds=end_time_mid - start_time)))
+        total_timeCount = total_timeCount + result[1].microseconds
+        end_time_mid = timer()
+        print(result);
+        print('Iteration: {0}. Time elapsed so far {1}'.format(i, timedelta(seconds=end_time_mid - start_time)))
 
     end_time = timer()
 
