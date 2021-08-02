@@ -47,7 +47,6 @@ def calculate_date_faster(date_string='09.07.2010 23:36',
 
     gen_dates.sort()
     end_time = timer()
-    return_value = [None] * 2
     if len(gen_dates) > 0:
         return gen_dates[0], timedelta(seconds=end_time - start_time)
     else:
