@@ -2,7 +2,7 @@ import rx
 import datetime
 from timeit import default_timer as timer
 from datetime import timedelta, datetime
-from clear_python import convert_string_to_date
+from clear_python_mypy import convert_string_to_date
 from rx import operators as ops
 # 0. 60 Code Lines
 # 1. Получаем год из даты которую запросили

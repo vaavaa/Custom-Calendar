@@ -9,6 +9,7 @@ from datetime import timedelta
 from timeit import default_timer as timer
 
 from clear_python import calculate_date_faster
+from clear_python_mypy import calculate_date_mypy
 from pandas_python import calculate_date_nice
 from rx_python import calculate_date_rx
 
@@ -17,6 +18,8 @@ class ClearNiceRx(Enum):
     clear = 0
     nice = 1
     rx = 2
+    mypy = 3
+
 
 def split_list(the_list, chunk_size):
     result_list = []
@@ -31,14 +34,17 @@ def final_time(start_time):
     print('Total elapsed time is : {0}'.format(timedelta(seconds=end_time - start_time)))
 
 
-def one_thread(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
+def one_thread(count_times=1000, clear_or_nice_or_rx=ClearNiceRx.mypy):
     start_time = timer()
     total_timeCount = 0
 
     for i in range(count_times):
         if clear_or_nice_or_rx == ClearNiceRx.clear:
             # Clear
-            result = calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)
+            result = calculate_date_faster()
+        elif clear_or_nice_or_rx == ClearNiceRx.mypy:
+            # Clear
+            result = calculate_date_mypy()
         elif clear_or_nice_or_rx == ClearNiceRx.nice:
             # Nice
             result = calculate_date_nice(day_matrix='45;12;1;29;2;', years_count=200)
@@ -78,7 +84,7 @@ def rx_multi_threads(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
             ops.map(lambda a: calculate_date_faster(day_matrix='45;12;1;29;2;', years_count=200)),
             ops.subscribe_on(thread_pool_scheduler)
         ).subscribe(
-            lambda s: final_time(start_time), #print("Next date is: {0}; Elapsed time: {1}".format(s[0], s[1]))
+            lambda s: final_time(start_time),  # print("Next date is: {0}; Elapsed time: {1}".format(s[0], s[1]))
             lambda error: print(error),
             on_next=final_time(start_time)
         )
@@ -112,5 +118,3 @@ def multi_threads(count_times=100000, clear_or_nice_or_rx=ClearNiceRx.clear):
           .format(count_times,
                   0,
                   timedelta(seconds=end_time - start_time)))
-
-
