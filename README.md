@@ -52,8 +52,10 @@ Algorithmic approach is the same for all 3 solutions, used modules are different
 Если обернуть в один поток в RX - то время разницы сокращается на 15 секунд.
 
 После get started with mypyc( читается мойпайк, а не как вы прочитали. :) ) такая картина получилась.
+22 secs in mypyc_module VS 26 secs in clear_python. Total: -4 secs.
 
 ![Picture](mypyc_vs_clear_python.png)
 
-Прирост не впечатляет, однако есть и изменения в коде: только прописанные типы возвращаемых значений и типизированые переменные.
+Прирост не впечатляет, однако и изменения в коде не впечатляют: прописанные типы возвращаемых значений + типизированые переменные.
 (see file: clear_python_mypy.py)
+Можно играться. :) 
